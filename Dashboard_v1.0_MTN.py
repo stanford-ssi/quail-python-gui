@@ -38,7 +38,7 @@ from window_size import *
 from button_commands import *
 
 # Declare Globals/Parameters Here
-update_interval = 50 # Time (ms) between polling/animation updates
+update_interval = 1000 # Time (ms) between polling/animation updates
 max_elements = 1440 # Maximum number of elements to store in plot lists
 num_command_buttons = 8 # number of command buttons
 num_data_channels = 7 # number of data channels (doesn't include time or command channels)
@@ -87,8 +87,8 @@ quail_com_port = 7
 
 
 # This function is called periodically from FuncAnimation
-def animate(frame, ch_ax, data):
-    global quail
+def animate(frame, ch_ax, i):
+    global quail, data
     # Update data to display temperature and light values
     try:
         quail_data = quail.get_measurements()
@@ -106,9 +106,6 @@ def animate(frame, ch_ax, data):
     # Limit lists to a set number of elements
     data = data[-max_elements:,:]
 
-    print(np.shape(data))
-    print(data[:,-1])
-    print(data[:,1])
     # Update small plots
     for i in range(num_data_channels):
         ch_ax[i].clear()
@@ -116,7 +113,8 @@ def animate(frame, ch_ax, data):
         ch_ax[i].plot(data[:,-1],data[:,i],'r')
         ch_ax[i].axes.xaxis.set_ticklabels([])
     
-def animate2(frame, focus_ax, data, focus1, focus2):
+def animate2(frame, focus_ax, focus1, focus2):
+    global data
     focus = [0, 0]
     focus[0] = channel_names.index(focus1.get())
     focus[1] = channel_names.index(focus2.get())
@@ -254,10 +252,10 @@ root.bind('<Escape>', lambda event: end_fullscreen(root, fullscreen, dfont, fram
 root.bind("<Destroy>", lambda event: None)
 
 # Call animate() function periodically
-fargs = (ch_ax, data)
+fargs = (ch_ax, 1)
 ani = animation.FuncAnimation(  fig, animate, fargs=fargs, interval=update_interval)
-fargs2 = (focus_ax, data, focus1, focus2)
-# ani2 = animation.FuncAnimation( focus_fig, animate2, fargs=fargs2, interval=update_interval)                       
+fargs2 = (focus_ax, focus1, focus2)
+ani2 = animation.FuncAnimation( focus_fig, animate2, fargs=fargs2, interval=update_interval)                       
 
 # Start in fullscreen mode and run
 root.tk.call('source', 'black.tcl')
