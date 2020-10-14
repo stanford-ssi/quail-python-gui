@@ -21,6 +21,7 @@ class quail:
         self.serial = serial.Serial('COM{}'.format(COM_Port))
         self.COM_Port = COM_Port
         print(self.serial.readline())
+
     
     def get_measurements(self):
         # Clear device (laptop buffer)

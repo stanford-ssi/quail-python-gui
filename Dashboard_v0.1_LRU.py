@@ -30,6 +30,7 @@ import matplotlib.figure as figure
 import matplotlib.animation as animation
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
+
     # Quail 1.0 Module goes below
 from quail_serial import *
 
@@ -59,7 +60,7 @@ solenoid_one = False # Start Solenoids in Off -> Flase
 
 # Quail object
 quail_com_port = 7
-quail = quail(quail_com_port)
+#quail = quail(quail_com_port)
 
 ###############################################################################
 # Functions
@@ -138,7 +139,7 @@ def toggle_ch1():
     ch1_ax1.get_yaxis().set_visible(ch1_plot_visible)
     canvas.draw()
     
-# Toggle the ch1 plot
+# Toggle the ch2 plot
 def toggle_ch2():
 
     global canvas
@@ -151,7 +152,7 @@ def toggle_ch2():
     ch2_ax1.get_yaxis().set_visible(ch2_plot_visible)
     canvas.draw()
 
-# Toggle the ch1 plot
+# Toggle the ch3 plot
 def toggle_ch3():
 
     global canvas
@@ -164,7 +165,7 @@ def toggle_ch3():
     ch3_ax1.get_yaxis().set_visible(ch3_plot_visible)
     canvas.draw()
 
-# Toggle the ch1 plot
+# Toggle the ch4 plot
 def toggle_ch4():
 
     global canvas
@@ -177,7 +178,7 @@ def toggle_ch4():
     ch4_ax1.get_yaxis().set_visible(ch4_plot_visible)
     canvas.draw()
 
-# Toggle the ch1 plot
+# Toggle the ch5 plot
 def toggle_ch5():
 
     global canvas
@@ -190,7 +191,7 @@ def toggle_ch5():
     ch5_ax1.get_yaxis().set_visible(ch5_plot_visible)
     canvas.draw()
 
-# Toggle the ch1 plot
+# Toggle the ch6 plot
 def toggle_ch6():
 
     global canvas
