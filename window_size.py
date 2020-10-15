@@ -12,7 +12,3 @@ def end_fullscreen(root, fullscreen, frame, event=None):
     fullscreen = False
     root.attributes('-fullscreen', False)
     resize(frame) 
-
-# Dummy function prevents segfault
-def _destroy(event):
-    pass

@@ -19,7 +19,8 @@ def get_defined_commands(command = ""):
 
 def launch():
     if msgbox.askokcancel ('Launch Confirmation','Initiate Launch Sequence?',icon = 'warning') : 
-       print("LAUNCHING....")
+       msgbox.askokcancel('Uhhh you didnt write that command yet')
+    pass
 
 def oxvent1():
     global quail
@@ -40,7 +41,7 @@ def open_command_dialog(curr_commands, buttons):
         l.grid(row=i, column=0)
         var = tk.StringVar(win)
         var.set(curr_commands[i].get())
-        b = ttk.OptionMenu(win,var,curr_commands[i].get(),*command_options)
+        b = ttk.OptionMenu(win,var,curr_commands[i].get(),'-',*command_options)
         b.grid(row=i,column=1)
         drops.append(var)
     update = tk.Button(win,text = "Update Buttons",command = lambda: update_buttons(drops, curr_commands))
