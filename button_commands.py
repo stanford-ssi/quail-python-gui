@@ -5,6 +5,12 @@ import tkinter.messagebox as msgbox
 
 from quail_serial import *
 
+# Write Pulse and Hold commands for Fuel Press, Ox Fill, Ox Vent X6
+# Write Pulse for ( Ox Vent & Ox Fill ) X1
+# Write actual launch command seq, with dialog output x1 
+#   (will have subcommands ignite, pyrofuel, pyroox,line-bleed)
+# Write abort (fuel pyro, ox vent), abort ox (ox pyro), abort fuel (fuel pyro), DangerAbort with warning (fuel pyro, ox pyro)
+
 def get_defined_commands(command = ""):
     command_func = {
         "Launch" :  launch,
