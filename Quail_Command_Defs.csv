@@ -1,0 +1,25 @@
+11, Open Ox Vent
+12, Open Fuel Press 
+13, Open Ox Fill
+14, Open Ox Bleed
+15, Open Fuel Bleed
+16, Open Extra Solenoid (Pyro Shutoff)
+21, Close Ox Vent
+22, Close Fuel Press 
+23, Close Ox Fill
+24, Close Ox Bleed
+25, Close Fuel Bleed
+26, Close Extra Solenoid (Pyro Shutoff)
+51, Pulse Ox Vent
+52, Pulse Fuel Press 
+53, Pulse Ox Fill
+54, Pulse Ox Bleed
+55, Pulse Fuel Bleed
+56, Pulse Extra Solenoid (Pyro Shutoff)
+61, Fire Fuel Pyrovalve
+62, Fire Ignitor
+65, Fire Ox Pyrovalve
+69, LAUNCH (Ign + Delay + 2XPyro)
+11 + 12 + 13 + 14 + 15 + 16, CloseAll
+22 + 23 + 11 + 61 + 55 + 14, Abort
+22 + 23 + 11 + 61 + 65 + 55, DangerAbort

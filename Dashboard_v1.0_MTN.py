@@ -68,9 +68,11 @@ data_f = None
 test_name = tk.StringVar()
 test_name.set("Test Name: GUI_TEST") #initial test name, can be updated during runtime
 time_on_screen = 15 # sec for which data is on the screen before falling off left side, can be changed in runtime
-max_elements = int(time_on_screen/1.57/(update_interval/1000)) # Maximum number of elements to store in plot lists
+tweak = 1.359
+max_elements = int(time_on_screen/tweak/(update_interval/1000)) # Maximum number of elements to store in plot lists
+max_data_len_local = int(300/tweak/(update_interval/1000)) #length of maximum number of data elements kept (available to be plotted if user changes width)
 consider_range = max_elements
-data = np.zeros((max_elements,1 + num_data_channels)) # create data matrix with column for time + data_streams
+data = np.zeros((max_data_len_local,1 + num_data_channels)) # create data matrix with column for time + data_streams
 ch_offsets = np.zeros((1,num_data_channels))
 ch_ax = []
 focus_ax = []
@@ -81,7 +83,7 @@ with open("Quail_Command_Defs.csv",newline="") as csvfile:
     myreader = csv.reader(csvfile, delimiter=',')
     for row in myreader:
         try:
-            valid_quail_commands[row[1] +"\t" + row[0]] = int(row[0])
+            valid_quail_commands[row[1] +"\t" + row[0]] = row[0]
         except: 
             pass
 
@@ -116,7 +118,7 @@ def kill():
 def reset_plots():
     global data, ch_offsets
     ch_offsets = np.zeros((1,num_data_channels))
-    data[:,:-1] = np.zeros((max_elements,num_data_channels))
+    data[:,:-1] = np.zeros((max_data_len_local,num_data_channels))
     red()
 
 def record():
@@ -141,12 +143,9 @@ def set_plot_width():
     global update_interval, max_elements, time_on_screen, data, num_data_channels
     time_on_screen = dialog.askfloat("Change Plot Width", "Enter new time-width of plot in seconds:")
     if time_on_screen != None : 
-        old_max = max_elements
-        max_elements = int(time_on_screen/1.57/(update_interval/1000))
-        if max_elements > old_max:
-            data = np.append(np.zeros((max_elements - old_max, num_data_channels+1)),data,axis = 0)
-        elif max_elements < old_max:
-            data = data[-max_elements:,:]
+        max_elements = int(time_on_screen/tweak/(update_interval/1000)) # set new value of display width in num of samples
+        if max_elements > max_data_len_local:
+            max_elements = max_data_len_local # don't allow user to display more data than is available
         red()
 
 def add_alias():
@@ -158,7 +157,6 @@ def add_alias():
     menu.delete(0, 'end')
     for key in sorted(valid_quail_commands.keys()):
         menu.add_command(label = key, command = lambda v=key: update_curr_command(v))
-    command_selected.set("-")
 
 def update_curr_command(value):
     global command_write
@@ -168,6 +166,10 @@ def update_curr_command(value):
 def tare_ch(ch_index):
     global ch_offsets
     ch_offsets[0,ch_index] =  - data[-1,ch_index]  # shift channel value by current value
+
+def untare_all():
+    global ch_offsets
+    ch_offsets = np.zeros((1,num_data_channels))
 
 def set_offsets():
     global ch_offsets
@@ -230,16 +232,16 @@ def animate(frame, ch_ax, ch_lines, ch_text, ch_min, ch_max):
     except:
         data = np.append(data, [data[-1,-1]*np.power(np.cos(data[-1,-1]/2 * np.arange(1,num_data_channels+2,1)),2)], axis = 0) ### COMMMENT ME OUT IF USING QUAIL\
         data[-1,-1] = data[-2,-1] + update_interval/1000 ### COMMMENT ME OUT IF USING QUAIL\
-        new_command = 0 ### COMMMENT ME OUT IF USING QUAIL\
+        #data[-1,:] = np.append( data, [-1 * np.ones(1,num_data_channels+1)]) #add -1 if failed to read quail here
+        new_command = 0
         # print("Failed to read Quail data")
-        #pass
 
     # Update current command value
     curr_command.set(new_command)
 
     # Limit lists to a set number of elements
-    data = data[-max_elements:,:]
-    plot_data = data + np.dot( np.ones((max_elements,1)) , np.append(ch_offsets,[[0]],axis=1) )
+    data = data[-max_data_len_local:,:]
+    plot_data = data[-max_elements:,:] + np.dot( np.ones((max_elements,1)) , np.append(ch_offsets,[[0]],axis=1) )
     # Update small plots
     for i in range(num_data_channels):
         lims = (0, max(plot_data[-consider_range:,i])+1e-10)
@@ -270,7 +272,7 @@ def animate2(frame, focus_ax, focus_lines, focus_text, focus_min, focus_max, foc
     focus = [0, 0]
     focus[0] = channel_names.index(focus1.get())
     focus[1] = channel_names.index(focus2.get())
-    plot_data = data + np.dot( np.ones((max_elements,1)) , np.append(ch_offsets,[[0]],axis=1)) 
+    plot_data = data[-max_elements:] + np.dot( np.ones((max_elements,1)) , np.append(ch_offsets,[[0]],axis=1)) 
     for i in range(len(focus)):
         j = focus[i]
         lims = (0, max(plot_data[-consider_range:,j])+1e-10)
@@ -350,7 +352,7 @@ for i in range(num_data_channels):
     ch_ax[i].set_ylim(lims)
     ch_ax[i].set_xticklabels([])
     ch_ax[i].set_yticklabels([])
-    ch_lines[i], = ch_ax[i].plot(np.arange(0,max_elements,1),data[:,i],colors[i])
+    ch_lines[i], = ch_ax[i].plot(np.arange(0,max_elements,1),data[-max_elements:,i],colors[i])
 
 # Create two larger figures
 focus_fig = figure.Figure()
@@ -372,7 +374,7 @@ for i in range(2):
     focus_titles.append(focus_ax[i].text(int(max_elements/2),0.98*lims[1],str(channel_names[i]),fontsize=14, ha = "center", va = "top"))
     focus_ax[i].set_xlim((0, max_elements*1.2))
     focus_ax[i].set_ylim(lims)
-    focus_lines[i], = focus_ax[i].plot(np.arange(0,max_elements,1),data[:,i],colors[i])
+    focus_lines[i], = focus_ax[i].plot(np.arange(0,max_elements,1),data[-max_elements:,i],colors[i])
     focus_ax[i].set_xticklabels([])
     focus_ax[i].set_yticklabels([])
     focus_ax[i].tick_params(axis="y",direction="in", pad=-22)
@@ -483,6 +485,7 @@ for i in range(num_data_channels):
     plotmenu.add_command(label="Tare Ch. "+str(i+1)+" = "+channel_names[i], command=lambda a=i: tare_ch(a))
 plotmenu.add_command(label = "Update Offset Values", command = set_offsets)
 plotmenu.add_separator()
+plotmenu.add_command(label="Un-tare All Channels", command=lambda: untare_all())
 plotmenu.add_command(label="Clear/Reset Plots", command=lambda: reset_plots())
 menubar.add_cascade(label="Plotting", menu=plotmenu)
 recordmenu = tk.Menu(menubar, tearoff=0)
@@ -519,3 +522,10 @@ root.mainloop()
 
 ############################ TO-DO ############################
 # add pad below zero so that some negative data can be seen
+# add pyro commands as option for buttons
+# add capacity for quail to understand an alias name, get items from quail command dict
+# add "reading from quail" label that changes if GUI fails to read a packet (may be an issue if not reading packet is frequent)
+# add "redlines" and "bluelines" objects that get updated in animation if they exist
+# tie redline violation to command that opens dialog with info and sends command to quail
+# create command window to set or shut off redlines (if redline value <0)
+# figure out if load cell down force is positive or negative, take abs value if needed so that adding weight increases
