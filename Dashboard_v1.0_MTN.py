@@ -83,7 +83,7 @@ with open("Quail_Command_Defs.csv",newline="") as csvfile:
     myreader = csv.reader(csvfile, delimiter=',')
     for row in myreader:
         try:
-            valid_quail_commands[row[1] +"\t" + row[0]] = row[0]
+            valid_quail_commands[row[1].strip() +"\t" + row[0].strip()] = row[0]
         except: 
             pass
 
@@ -106,7 +106,7 @@ record_to = None
 
 # Quail object
 quail_com_port = 7
-# quail = quail(quail_com_port)
+quail = quail(quail_com_port)
 
 ###############################################################################
 # Functions
@@ -156,6 +156,7 @@ def add_alias():
     menu = command_drop_down["menu"]
     menu.delete(0, 'end')
     for key in sorted(valid_quail_commands.keys()):
+        key = key.strip()
         menu.add_command(label = key, command = lambda v=key: update_curr_command(v))
 
 def update_curr_command(value):
@@ -414,8 +415,9 @@ pulse_button = ttk.Button(focus_sel_frame,textvariable=pulse_time,command=lambda
 pulse_button.grid(row=1, column=5, rowspan = 1, columnspan = 1, sticky = 'nsew')
 focus_sel_frame.rowconfigure(0, weight = 1)
 focus_sel_frame.rowconfigure(1, weight = 1)
-for i in range(6):
-    focus_sel_frame.columnconfigure(i,weight = 1)
+focus_sel_frame.columnconfigure(1,weight = 1)
+focus_sel_frame.columnconfigure(3,weight = 1)
+focus_sel_frame.columnconfigure(4,weight = 1)
 
 # Add items to command frame, where user can input integer quail command value
 curr_command = tk.IntVar() #variable storing the command that Quail serial returns
@@ -522,7 +524,10 @@ root.mainloop()
 
 ############################ TO-DO ############################
 # add pad below zero so that some negative data can be seen
-# add pyro commands as option for buttons
+# change xdata to be scaled in the same way that ydata is, to capture time appropriately 
+#               (just shift data in x to the left by total time window - windowsize, set lims to go 0,windowsize)
+#               (then consider adding x-axis labels?)
+#               (plot data - data(-1,-1) (last time); have to handle what to plot if not reading from quail)
 # add capacity for quail to understand an alias name, get items from quail command dict
 # add "reading from quail" label that changes if GUI fails to read a packet (may be an issue if not reading packet is frequent)
 # add "redlines" and "bluelines" objects that get updated in animation if they exist

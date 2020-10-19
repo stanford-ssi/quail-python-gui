@@ -13,15 +13,16 @@ Oct 2020
 import serial
 import time
 import threading
+import __main__
 
 
 # Create quail class that can be called as object later on
 class quail:
     def __init__(self, COM_Port=11, baud_rate =115200):
         # Establish connection and print test data
-        self.serial = serial.Serial('COM{}'.format(COM_Port))
+        # self.serial = serial.Serial('COM{}'.format(COM_Port))
         self.COM_Port = COM_Port
-        print(self.serial.readline())
+        # print(self.serial.readline())
 
     
     def get_measurements(self):
@@ -44,33 +45,47 @@ class quail:
         try: #handle simple numeric command
             command = int(command)
             print("Writing command: " + str(command))
-            self.serial.write((str(command) + '\r\n').encode())
-        except: #handle list of commands or equation with "wait15.5"
             try:
-                if isinstance(command, str): # if item passed in is a string waiting to be broken up
-                    commands = command.split('+') #try to split into individual functions separated by +
-                else:
-                    commands = command[:] # if not a string, must be iterable of strings/ints
+                timer.sleep(0.05) #wait to ensure any command before this one has sent
+                self.serial.write((str(command) + '\r\n').encode())
             except:
+                print("Failure sending command to Quail...")
+
+        except: #handle list of commands or equation with "wait##"
+            try: # if user passed in a string, check if alias or equation and break into iterable list of numeric commands/waits
+                if isinstance(command, str): # if item passed in is a string waiting to be broken up
+                    command = command.strip().lower()
+                    try:
+                        for key in __main__.valid_quail_commands.keys():
+                            if command == (key.split('\t')[0]).strip().lower() : # if command is an alias
+                                self.write_command(__main__.valid_quail_commands[key])
+                                return
+                    except:
+                        pass
+                    commands = command.split('+') #try to split into individual functions separated by +
+                else: # if not a string, must be a list of numeric commands/waits
+                    commands = command[:] # if not a string, must be iterable of strings/ints
+
+            except: #if cant break into an iterable, throw error
                 print("INVALID COMMAND : " + str(command))
                 return
             
-            # Validate string of commands before attempting to run
+            # Validate entire string of commands before attempting to run any one
             for i in range(len(commands)):
-                c = commands[i]
+                c = commands[i].strip()
                 try:
-                    if c[:4] == "wait":
+                    if c[:4] == "wait": #if a wait command, make sure what follows is numeric wait value
                         c = c[4:].strip()
                         c = float(c)
-                    else:
+                    else: # if not a wait command, must be a numeric command
                         c = int(c)
                 except:
                     print("INVALID COMMAND ENCOUNTERED : " + str(command))
                     return
 
-            # Call functions if valid
+            # Call functions if iterable list was valid
             for i in range(len(commands)):
-                c = commands[i]
+                c = commands[i].strip()
                 if c[:4] == "wait" :
                     c = c[4:].strip() # strip wait indicator off and start timer thread
                     c = float(c)
@@ -78,13 +93,17 @@ class quail:
                         timer = threading.Timer(c,lambda : self.write_command(commands[i+1:]))
                         timer.start() 
                     except:
-                        pass
-                    return # return function, as thread will start new function call with remaining commands after timer elapses
+                        pass # if the command fails after waiting or if wait was last command, pass to the return statement below
+                    return # thread will start new function call with remaining commands after timer elapses, so can return here
                 else:
                     c = int(c)
-                    time.sleep(.05) #wait to ensure previous command has sent
-                    print("Write command: " + str(c))
-                    self.serial.write((str(command) + '\r\n').encode())
+                    print("Writing command: " + str(c))
+                    try:
+                        time.sleep(.05) #wait to ensure previous command has sent
+                        self.serial.write((str(command) + '\r\n').encode())
+                    except:
+                        print("Failure sending command to Quail...")
+                        return # if you fail to send a command in the string, don't try to send more
             
         
         

@@ -6,22 +6,20 @@ import tkinter.simpledialog as dialog
 import __main__ 
 from quail_serial import *
 
-# Write Pulse and Hold commands for Fuel Press, Ox Fill, Ox Vent X6
-# Write Pulse for ( Ox Vent & Ox Fill ) X1
-# Write actual launch command seq, with dialog output x1 
-#   (will have subcommands ignite, pyrofuel, pyroox,line-bleed)
-# Write abort (fuel pyro, ox vent), abort ox (ox pyro), abort fuel (fuel pyro), DangerAbort with warning (fuel pyro, ox pyro)
-
 pulse_sec = 1.0
 open_offset = 10 # open command is 10 + solenoid number
 close_offset = 20 # close command is 20 + solenoid number
+squib_offset = 60 # squib command is 60 + squib channel
 oxvent_ch = 1
 fuelpress_ch = 2
 oxfill_ch = 3
 oxabort_ch = 4
 fuelabort_ch = 5
 extrasol_ch = 6
-
+fuelpyro_ch = 1
+oxpyro_ch = 5
+igniter_ch = 2
+launch_command = 69 #launch command in quail, fires igniter, delays, then fires pyro valves simultaneously
 
 def get_defined_commands(command = ""):
     command_func = {
@@ -41,6 +39,10 @@ def get_defined_commands(command = ""):
         "FuelAbort Hold" : lambda event: hold_solenoids(fuelabort_ch),
         "ExtraSol Pulse" : lambda event: pulse_solenoids(extrasol_ch),
         "ExtraSol Hold" : lambda event: hold_solenoids(extrasol_ch),
+        "Open Fuel Pyro" : lambda event: fire_squib(fuelpyro_ch),
+        "Open Ox Pyro" : lambda event: fire_squib(fuelpyro_ch),
+        "Start Igniter" : lambda event: fire_squib(igniter_ch),
+        "Open BOTH Pyro" : lambda event: fire_squib([fuelpyro_ch, oxpyro_ch]),
         "-" : lambda event: None
     }
     if command == "":
@@ -78,7 +80,7 @@ def launch(event):
             __main__.quail.write_command(close_offset+oxfill_ch)
             __main__.quail.write_command(close_offset+fuelpress_ch)
             __main__.quail.write_command(open_offset+oxvent_ch)
-            __main__.quail.write_command(69)
+            __main__.quail.write_command(launch_command)
         else:
             try:
                 win.destroy()
@@ -109,23 +111,21 @@ def launch(event):
         win.rowconfigure(1,weight =1)
 
 def abort(event):
-    __main__.quail.write_command(close_offset+oxfill_ch)
-    __main__.quail.write_command(close_offset+fuelpress_ch)
-    __main__.quail.write_command(open_offset+oxvent_ch)
-    __main__.quail.write_command(61) # fire pyrovalve
+    __main__.quail.write_command(close_offset+oxfill_ch)  #close ox fill
+    __main__.quail.write_command(close_offset+fuelpress_ch) #close fuel press
+    __main__.quail.write_command(open_offset+oxvent_ch)  #open ox vent
+    __main__.quail.write_command(fuelpyro_ch + squib_offset) # fire fuel pyrovalve
 
 def pulse_solenoids(solenoid_base):
     def close_sol(): # command to which thread returns after waiting "pulse_sec"
         for base in solenoid_base:
-            print("close")
-            # __main__.quail.write_command(base+close_offset)
+            __main__.quail.write_command(base+close_offset)
     try:
         solenoid_base[0]
     except TypeError:
         solenoid_base = [solenoid_base] #make sure base is iterable - if single, wrap in brackets
     for base in solenoid_base:
-        # __main__.quail.write_command(base + open_offset)
-        print("open")
+        __main__.quail.write_command(base + open_offset)
     timer = threading.Timer(pulse_sec, close_sol)
     timer.start() # pulses for pulse_sec without blocking other updates by starting parallel thread
 
@@ -142,6 +142,13 @@ def hold_solenoids(solenoid_base):
         __main__.quail.write_command(base + open_offset)
     __main__.root.bind("<ButtonRelease-1>",lambda event: close_on_release())
 
+def fire_squib(squib_base):
+    try:
+        squib_base[0]
+    except TypeError:
+        squib_base = [squib_base] #make sure base is iterable - if single, wrap in brackets
+    for base in squib_base:
+        __main__.quail.write_command(base + squib_offset)
 
 ######################## GUI FUNCTIONS FOR UPDATING VALUES ###############################
 
@@ -164,7 +171,7 @@ def open_command_dialog(curr_commands, buttons):
         var = tk.StringVar(win)
         var.set(curr_commands[i].get())
         b = ttk.OptionMenu(win,var,curr_commands[i].get(),'-',*command_options)
-        b.grid(row=i,column=1)
+        b.grid(row=i,column=1,sticky='ew')
         drops.append(var)
     update = tk.Button(win,text = "Update Buttons",command = lambda: update_buttons(drops, curr_commands))
     update.grid(row = len(curr_commands), column = 1)
