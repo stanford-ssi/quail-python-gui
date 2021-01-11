@@ -3,7 +3,7 @@
 This is the dashboard code for interfacing with Quail 2.0.
 
 Current understanding of Quail 2.0 serial output:
-7 data channels
+6 data channels
 1 time channel
 1 channel displaying the current command
 
@@ -216,7 +216,7 @@ def animate(frame, ch_ax, ch_lines, ch_text, ch_min, ch_max):
                     pass
             else:
                 file_base = file_base + add_on
-            record_to = file_base + "/" + test_name.get() + "___" + d_string + "___" + t_string + ".txt"
+            record_to = file_base + "/" + test_name.get().split(":")[1].strip() + "___" + d_string + "___" + t_string + ".txt"
             data_f=open(record_to,'w+')
     elif data_f != None:
         record_label.configure(text = "Not Recording",background = 'white',foreground=colors[0])
@@ -495,6 +495,13 @@ recordmenu.add_command(label="Start Recording", command=lambda: record())
 recordmenu.add_command(label="Stop & Save Recording", command=lambda: record())
 recordmenu.add_command(label="Change Test Name", command=lambda: change_test_name())
 menubar.add_cascade(label="Record", menu=recordmenu)
+linemenu = tk.Menu(menubar, tearoff=0)
+linemenu.add_command(label="Set Red Line Values", command=lambda: None)
+linemenu.add_command(label="Set Blue Line Values", command=lambda: None)
+linemenu.add_separator()
+linemenu.add_command(label="Turn Limit Protection On", command=lambda: None)
+linemenu.add_command(label="Turn Limit Protection Off", command=lambda: None)
+menubar.add_cascade(label="Limit Protection", menu=linemenu)
 root.config(menu=menubar)
 
 
@@ -528,9 +535,12 @@ root.mainloop()
 #               (just shift data in x to the left by total time window - windowsize, set lims to go 0,windowsize)
 #               (then consider adding x-axis labels?)
 #               (plot data - data(-1,-1) (last time); have to handle what to plot if not reading from quail)
-# add capacity for quail to understand an alias name, get items from quail command dict
 # add "reading from quail" label that changes if GUI fails to read a packet (may be an issue if not reading packet is frequent)
 # add "redlines" and "bluelines" objects that get updated in animation if they exist
 # tie redline violation to command that opens dialog with info and sends command to quail
 # create command window to set or shut off redlines (if redline value <0)
 # figure out if load cell down force is positive or negative, take abs value if needed so that adding weight increases
+
+
+# Create separate file that can be started as a parallel thread that does data collection as fast as possible, and remove that process
+# from the animate function

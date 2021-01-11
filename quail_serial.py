@@ -14,7 +14,13 @@ import serial
 import time
 import threading
 import __main__
+import numpy as np
+import sys, os
+from datetime import datetime
 
+num_elements_in_tick = 1 + 6 + 1 # number of data elements in each stream ( zero check, num data channels, time)
+record_to = None
+data_f = None
 
 # Create quail class that can be called as object later on
 class quail:
@@ -22,8 +28,9 @@ class quail:
         # Establish connection and print test data
         # self.serial = serial.Serial('COM{}'.format(COM_Port))
         self.COM_Port = COM_Port
+        self.data = None
         # print(self.serial.readline())
-
+        
     
     def get_measurements(self):
         # Clear device (laptop buffer)
@@ -37,8 +44,36 @@ class quail:
         measurements = []
         for val in val_string:
             measurements.append(float(val))
-        if measurements[0] != 0:
-            return None # zero check first item in measurement
+        measurements = np.asarray(measurements)
+        if self.data == None :
+            self.data = np.zeros((1, np.size(measurements)))
+            self.data[0,:] = measurements
+        elif measurements[0] == 0:
+            np.append(self.data, measurements, axis = 0)
+
+        if __main__.recording:
+            if record_to == None:
+                __main__.record_label.configure(text = "RECORDING",background = colors[0],foreground='white')
+                now=datetime.now()
+                d_string = now.strftime("%d_%m_%Y")
+                t_string = now.strftime("%H_%M_%S")
+                file_base = sys.path[0]
+                add_on = "/Data/"+d_string
+                if not os.path.exists(file_base+add_on):
+                    try: 
+                        os.makedirs(sys.path[0] + add_on)
+                        file_base = file_base + add_on
+                    except OSError:
+                        pass
+                else:
+                    file_base = file_base + add_on
+                record_to = file_base + "/" + test_name.get().split(":")[1].strip() + "___" + d_string + "___" + t_string + ".txt"
+                data_f=open(record_to,'w+')
+        elif data_f != None:
+            __main__.record_label.configure(text = "Not Recording",background = 'white',foreground=colors[0])
+            record_to = None
+            data_f.close()
+
         return measurements[1:]
             
     def write_command(self, command):
@@ -100,7 +135,7 @@ class quail:
                     print("Writing command: " + str(c))
                     try:
                         time.sleep(.05) #wait to ensure previous command has sent
-                        self.serial.write((str(command) + '\r\n').encode())
+                        self.serial.write((str(command) + '\r\n').encode()) #convert unicode string to utf-8 and send through serial
                     except:
                         print("Failure sending command to Quail...")
                         return # if you fail to send a command in the string, don't try to send more

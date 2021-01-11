@@ -152,13 +152,6 @@ def fire_squib(squib_base):
 
 ######################## GUI FUNCTIONS FOR UPDATING VALUES ###############################
 
-def update_pulse(pulse_time):
-    global pulse_sec
-    new_time = dialog.askfloat("Update Pulse Time", "New Pulse Time in Seconds: ")
-    if new_time != None:
-        pulse_time.set("Pulse Time = " + str(new_time) +" sec")
-        pulse_sec = new_time
-
 def open_command_dialog(curr_commands, buttons):
     win = tk.Toplevel()
     win.grab_set()
