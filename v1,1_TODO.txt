@@ -2,8 +2,6 @@ TODO:
 
 - (DONE) Timeout on Quail "readline" to ensure that lost connection doesn't block closing the window
 - (DONE) Add "start recording" button in record pane in addition to ability to do from menubar (becomes "stop" when recording)
-	- Allow entry box to grow to fill extra space
-- Fix full-screen so that the app opens full screen
 - Fix launch window so that it isn't blocking
 - (DONE) Add options to change COM PORT, attempt serial re-connection, in menubar Quail tab
 - (DONE) Handle failed connection on start (data_process keeps trying until it has a connection)

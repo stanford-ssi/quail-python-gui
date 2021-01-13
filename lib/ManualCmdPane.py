@@ -4,7 +4,7 @@ import tkinter.simpledialog as dialog
 import threading
 import csv
 
-commands_file = "Quail_Command_Defs.csv"
+commands_file = "lib/Quail_Command_Defs.csv"
 
 class ManualCmdPane(ttk.Frame):
     def __init__(self, mainwindow, mainframe, quail):

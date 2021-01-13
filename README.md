@@ -1,6 +1,8 @@
 Quail Dashboard v1.1
 ====================
 
+** Last Updated: 1/13/2021 **  
+
 Overview
 --------
 The Quail Dashboard is a Python Tkinter application that reads data from serial USB communication and displays it in real time.
@@ -13,7 +15,7 @@ The application has currently been verified on Windows 10 and Linux (via WSL2 & 
 
 Getting Started
 ---------------
-Running 'setup.py' will automatically check for and install all required Python modules listed in the 'requirements.txt' file.
+All required modules and minimum versions are listed in 'requirements.txt' - to ensure that you have all required modules, run 'python -m pip install -r requirements.txt' in your terminal.
 
 To run the application, double-click 'QuailDashboard_v1,1.py' in File Explorer or run 'python QuailDashboard_v1,1.py' in your preferred terminal.
 
