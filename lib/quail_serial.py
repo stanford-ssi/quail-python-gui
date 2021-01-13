@@ -41,12 +41,6 @@ class quail:
     ### and writes it to a user-specified data file. Making this a thread allows GUI updating and recording to happen "simultaneously" (during time
     ### between GUI updates, the recording thread can work).
 
-    ## TODO: 
-    ## - handle failed COM connection at start
-    ## - Handle COM_Port switching, dropping of COM connection
-    ## - if COM connection is dropped, keep trying to connect
-    ## - handle command-send failures
-
     def __init__(self, mainwindow, COM_Port=11, baud_rate =115200):
         # Establish connection
         if COM_Port < 0: # an un-realistic COM_Port request connects you to the Quail Emulator
