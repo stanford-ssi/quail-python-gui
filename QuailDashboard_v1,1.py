@@ -23,5 +23,6 @@ Complete Dashboard with Plotting Example
 
 from lib.MainWindow import MainWindow
 
-mainwindow = MainWindow()
-mainwindow.run()
+if __name__ == '__main__':
+    mainwindow = MainWindow()
+    mainwindow.run()

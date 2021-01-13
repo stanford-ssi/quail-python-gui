@@ -64,7 +64,7 @@ class FocusPane(ttk.Frame):
             self.ch_axes[i].set_yticklabels([])
             self.ch_lines[i], = self.ch_axes[i].plot([0],[0],self.graphpanes.ch_colors[i]) 
         
-        self.canvas.show()
+        self.canvas.draw()
         self.plot_canvas.configure(background = "black")
         self.plot_canvas.grid(row = 1, column = 0, rowspan = 10, columnspan = 4, sticky = 'nsew')
         self.rowconfigure(10, weight = 1)
@@ -91,7 +91,7 @@ class FocusPane(ttk.Frame):
                 self.ch_axes[i].set_xlim((-self.graphpanes.plot_width, self.graphpanes.plot_width*0.1))
                 self.ch_axes[i].set_xticks([-self.graphpanes.plot_width, 0])
                 self.ch_axes[i].set_ylabel(str(self.graphpanes.disp_units[i]))
-                self.canvas.show()
+                self.canvas.draw()
             self.ch_titles[i] = self.ch_axes[i].text(-self.graphpanes.plot_width/2,1.0,str(self.graphpanes.ch_names[focus[i]]),fontsize=14, ha = "center", va = "top")
             self.ch_text[i].set_text(str(round(self.graphpanes.ch_data[-1,i],decs))+" "+str(self.graphpanes.disp_units[focus[i]]))
             self.ch_text[i].set_color(self.graphpanes.ch_colors[focus[i]])

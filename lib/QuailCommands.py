@@ -27,10 +27,10 @@ igniter_ch = 2
 launch_command = 69 #launch command in quail, fires igniter, delays, then fires pyro valves simultaneously
 
 class QuailCommands:
-    def __init__(self, quail, mainwindow, pulse_sec = 1.0):
+    def __init__(self, quail, mainwindow, parent):
         self.quail = quail
         self.mainwindow = mainwindow 
-        self.pulse_sec = pulse_sec # Time duration in sec of pulse
+        self.parent = parent
         self.command_funcs = { # Library of command functions (will be passed an event on call)
             "ABORT" : lambda event: self.abort(),
             "Launch" :  lambda event: self.launch(),
@@ -142,7 +142,7 @@ class QuailCommands:
             solenoid_base = [solenoid_base] #make sure base is iterable - if single, wrap in brackets
         for base in solenoid_base:
             self.quail.write_command(base + open_offset)
-        timer = threading.Timer(self.pulse_sec, close_sol)
+        timer = threading.Timer(self.parent.pulse_sec, close_sol)
         timer.start() # pulses for pulse_sec without blocking other updates by starting parallel thread
 
     def hold_solenoids(self, solenoid_base):

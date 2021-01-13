@@ -47,7 +47,7 @@ class ChannelPane(FigureCanvasTkAgg):
             self.ch_axes[i].set_yticklabels([])
             self.ch_lines[i], = self.ch_axes[i].plot([0],[0],self.graphpanes.ch_colors[i]) 
         
-        self.show()
+        self.draw()
         self.plot_canvas.configure(background = "black")
 
         self.ani = animation.FuncAnimation(  self.fig, self.animate, interval=self.graphpanes.update_interval, blit=True)
@@ -68,7 +68,7 @@ class ChannelPane(FigureCanvasTkAgg):
                 self.ch_axes[i].set_xlim((-self.graphpanes.plot_width, self.graphpanes.plot_width*0.1))
                 self.ch_axes[i].set_xticks([-self.graphpanes.plot_width, 0])
                 self.ch_axes[i].set_ylabel(str(self.graphpanes.disp_units[i]))
-                self.show()
+                self.draw()
             self.ch_text[i].set_text(str(round(self.graphpanes.ch_data[-1,i],decs))+" "+str(self.graphpanes.disp_units[i]))
             self.ch_text[i].set_position((self.graphpanes.plot_width*.1, 0))
             self.ch_lines[i].set_data(self.graphpanes.time_data - self.graphpanes.curr_time, ( self.graphpanes.ch_data[:,i] + self.graphpanes.ch_offsets[0,i] )/(lims[1] - lims[0]))

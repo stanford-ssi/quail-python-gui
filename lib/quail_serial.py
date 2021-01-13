@@ -59,22 +59,29 @@ class quail:
             except:
                 self.serial = None
 
-        # Initialize class variables
+        # Initialize unpickled variables (anything the data and cmd processes don't use)
         self.mainwindow = mainwindow
+        self.filename = None # string name/filepath of file to which recorded data should be stored
+
+        # Initialize pickled variables (things that the data and cmd process use that are passed to the new process on start)
         self.num_data_channels = 6 # number of data channels
         self.COM_Port = COM_Port # COM Port used for serial connection, made process-safe via the Value object
         self.kill = mp.Queue(maxsize=1) # flag indicating if the data process is to be terminated (if full, kill process)
         self.recording = mp.Queue(maxsize=1) # flag indicating whether to record data recieved, (if full, record)
-        self.COM_queue = mp.Queue(maxsize=1) # flag indicating whether to change serial connection (if full, try to connect at new COM value)
-        self.filename = None # string name/filepath of file to which recorded data should be stored
+        self.COM_queue = mp.Queue(maxsize=1) # flag indicating whether to change serial connection (if full, try to connect at new COM value)   
         self.record_queue = mp.Queue() # internally-used queue to which the data_process pushes and from which the record_thread reads
-        self.data_queue = mp.Queue() # queue to which data is pushed
+        self.data_queue = mp.Queue() # queue to which ducer/sensor data is pushed
         self.command_queue = mp.Queue() # queue from which commands are read (GUI pushes commands here)
 
         # Create processes/threads (does not start the process/thread)
         self.data_process = mp.Process(name = "Quail_DataThread", target = self.data_worker)
         self.record_thread = threading.Thread(name = "Quail_RecordThread", target = self.record_worker)
-        self.cmd_thread = threading.Thread(name = "Quail_CmdThread", target = self.cmd_worker)
+
+    def __getstate__(self):
+        return self.serial, self.num_data_channels, self.COM_Port, self.kill, self.recording, self.COM_queue, self.record_queue, self.data_queue, self.command_queue
+
+    def __setstate__(self, state):
+        self.serial, self.num_data_channels, self.COM_Port, self.kill, self.recording, self.COM_queue, self.record_queue, self.data_queue, self.command_queue = state
 
     def start_collection(self):
         self.data_process.start() # start the data collection process, which calls data_worker
@@ -121,6 +128,7 @@ class quail:
                         f.write( self.record_queue.get() ) # if there is an item in the queue, remove it and write it 
 
     def data_worker(self):
+        self.cmd_thread = threading.Thread(name = "Quail_CmdThread", target = self.cmd_worker)
         self.cmd_thread.start() # start the cmd thread
         while self.kill.empty(): # while the process has not been killed
             if self.serial is None or self.COM_queue.full():

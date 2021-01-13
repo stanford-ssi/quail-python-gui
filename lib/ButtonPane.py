@@ -15,7 +15,7 @@ class ButtonPane(ttk.Frame):
         super().__init__(mainframe) # use parent constructor with mainframe as parent
         
         # Create QuailCommands object, which has all the user-defined commands
-        self.quailcmds = QuailCommands(quail, mainwindow, pulse_sec = INITIAL_PULSE_TIME)
+        self.quailcmds = QuailCommands(quail, mainwindow, self)
 
         # Create PulseTime button, allows user to determine the duration of a pulse
         self.pulse_sec = INITIAL_PULSE_TIME

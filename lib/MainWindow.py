@@ -74,7 +74,6 @@ class MainWindow(tk.Tk):
 
         # Set fullscreen
         self.fullscreen = True
-        self.attributes('-zoomed', True)
         self.attributes('-fullscreen', True)
         self.bind("<F11>", self.toggle_fullscreen)
         self.bind("<Escape>", self.end_fullscreen)
@@ -89,10 +88,12 @@ class MainWindow(tk.Tk):
     def toggle_fullscreen(self, event=None):
         self.fullscreen = not self.fullscreen  # Just toggling the boolean
         self.attributes("-fullscreen", self.fullscreen)
+        self.mainframe.pack(fill=tk.BOTH, expand=1) 
 
     def end_fullscreen(self, event=None):
         self.fullscreen = False
         self.attributes("-fullscreen", False)
+        self.mainframe.pack(fill=tk.BOTH, expand=1) 
 
     def run(self):
         self.quail.start_collection() # start Quail collection (if fails to connect, will keep trying)
