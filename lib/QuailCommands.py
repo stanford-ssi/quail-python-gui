@@ -53,6 +53,8 @@ class QuailCommands:
             "ExtraSol Hold" : lambda event: self.hold_solenoids(extrasol_ch),
             "Open Fuel Pyro" : lambda event: self.fire_squib(fuelpyro_ch),
             "Open Ox Pyro" : lambda event: self.fire_squib(fuelpyro_ch),
+            "Open Bleeds" : lambda event: self.open_bleeds(),
+            "Close Bleeds" : lambda event: self.close_bleeds(),
             "Start Igniter" : lambda event: self.fire_squib(igniter_ch),
             "Open BOTH Pyro" : lambda event: self.fire_squib([fuelpyro_ch, oxpyro_ch]),
             "-" : lambda event: None
@@ -95,6 +97,16 @@ class QuailCommands:
         ''' Command for aborting fuel side only - fires closes press line and blows fuel pyrovalve. '''
         self.quail.write_command(close_offset+fuelpress_ch) #close fuel press
         self.quail.write_command(fuelpyro_ch + squib_offset) # fire fuel pyrovalve
+
+    def open_bleeds(self):
+        ''' Opens both bleed solenoids - does not send any close command. '''
+        self.quail.write_command(open_offset + fuelbleed_ch)
+        self.quail.write_command(open_offset + oxbleed_ch)
+    
+    def close_bleeds(self):
+        ''' Closes both bleed solenoids. '''
+        self.quail.write_command(close_offset + fuelbleed_ch)
+        self.quail.write_command(close_offset + oxbleed_ch)
 
     def pulse_solenoids(self, solenoid_base):
         ''' Pulses the solenoid determined by solenoid_base. '''

@@ -7,7 +7,7 @@ INITIAL_PULSE_TIME = 1.0 # default starting pulse time
 MAX_PULSE_TIME = 10 # maximum pulse time allowed, in seconds
 MIN_PULSE_TIME = 0.1 # minimum pulse time allowed, in seconds
 
-initial_fuel_commands = ["FuelPress Pulse", "FuelPress Hold", "FuelBleed Hold", "-", "-", "-", "-",
+initial_fuel_commands = ["FuelPress Pulse", "FuelPress Hold", "FuelBleed Hold", "-", "-", "Open Bleeds", "Close Bleeds",
                          "Launch","Abort Fuel", "ABORT (dbl-clk)"]  # default initial commands
 initial_ox_commands = ["OxVent Pulse", "OxVent Hold", "OxFill Pulse", "OxFill Hold", "OxVent&Fill Pulse",
                     "OxVent&Fill Hold", "OxBleed Hold", "-", "Abort Ox","ABORT (dbl-clk)"]  # default initial commands
