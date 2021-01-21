@@ -22,7 +22,14 @@ Complete Dashboard with Plotting Example
 '''
 
 from lib.MainWindow import MainWindow
+import sys
+from datetime import datetime
 
 if __name__ == '__main__':
-    mainwindow = MainWindow()
-    mainwindow.run()
+    now = datetime.now()
+    d_string = now.strftime("%m / %d / %Y")
+    t_string = now.strftime("%H : %M : %S")
+    with open('Data/log.txt', 'w') as sys.stdout:
+        print("Quail Dashboard Log || Date: "+ d_string + " || Time: " + t_string)
+        mainwindow = MainWindow()
+        mainwindow.run()

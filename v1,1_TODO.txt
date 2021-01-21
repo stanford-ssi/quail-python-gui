@@ -1,14 +1,18 @@
 TODO: 
 
+- (DONE) Add ability to switch between "Ox" and "Fuel" panels
+- Adjust time from quail to seconds (value over serial is in milliseconds I think)
 - Don't open to actual full-screen, just to window that covers screen
 - Fix resizing so that shrinking the screen down still displays something intelligible
-- Fix launch window so that it isn't blocking
-- Indicate that abort requires double-click somehow
-- Fix formatting of aliases in dropdown
+- (DONE) Fix launch window so that it isn't blocking (overhaul the function altogether, probably, just change the text on the LAUNCH button)
+- (DONE) Indicate that abort requires double-click somehow
+- Fix formatting of aliases in dropdown on Windows
+- Fix Windows bug where changing time width causes issues with title and axis limit over-drawing
 - Add line-plotting feature
-- Adjust y-axis scaling to allow negative values (take minimum of data + [0])
+- Adjust y-axis scaling to allow negative values (take minimum of (data + [0]) )
 - Add scrolling to ChannelPane, ensure that adjusting the value of num_data_channels in Quail allows for more data to be displayed
-- Allow user to add scale factor (could be useful for scaling raw data)
-- Finish adding header comments
-- Add status indicator window after adjusting Quail serial output to show the status of the solenoids/squibs
-- Try running w real Quail
+- Allow user to add scale factor (could be useful for scaling raw data, not much additional computation)
+- Finish adding header comments everywhere!
+- Add status indicator window after adjusting Quail serial output to show the status of the solenoids/squibs (read the pins on each loop to get status)
+- Add battery voltage as one of the data items passed over serial
+- Try running w real Quail!

@@ -4,7 +4,7 @@ Module for talking to quail.  Sends and receives information.
 
 Current structure assumes data sent over serial in the following CSV format:
 
-time, CH1, CH2, CH3, CH4, CH5, CH6, zerocheck
+time, CH1, CH2, CH3, CH4, CH5, CH6, last_command, zerocheck
 
 Luke Upton + Max Newport
 Oct 2020
@@ -164,7 +164,10 @@ class quail:
         try:
             self.command_queue.put(int(command) )
         except:
-            print("Quail object recieved non-integer command")
+            try:
+                print("Quail object recieved non-integer command, " + str(command))
+            except:
+                print("Quail recieved a non-integer command")
 
     def set_COM_port(self):
         newCOM = dialog.askinteger("Edit COM Port", "Enter new COM Port: ")
