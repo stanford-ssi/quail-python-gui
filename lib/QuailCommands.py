@@ -69,10 +69,12 @@ class QuailCommands:
             return self.command_funcs[command]
 
     def launch(self):
-        ''' Launch command that opens dialogs to confirm launch, then starts launch sequence. '''          
+        ''' Launch command that opens dialogs to confirm launch, then starts launch sequence. 
+            Closes oxfill, fuel press, and ox vent, bleeds both sides, then sends launch command.'''          
         response = dialog.askfloat('Launch Confirmation','Enter any number and press OK to start launch sequence.\n (Closes fill/press/vent and immediately sends launch command)')
         try:    
             response = int(response)
+            self.open_bleeds()
             self.quail.write_command(close_offset+oxfill_ch)
             self.quail.write_command(close_offset+fuelpress_ch)
             self.quail.write_command(close_offset+oxvent_ch)
